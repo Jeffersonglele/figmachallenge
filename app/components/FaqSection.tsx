@@ -16,15 +16,21 @@ const MYTHS: Myth[] = [
     },
     {
         id: "duree",
-        claim: "Il faut prévoir toute une demi-journée.",
+        claim: "Il faut prévoir toute une demi-journée pour donner son sang.",
         reality:
-            "Le prélèvement lui-même dure environ 10 minutes. En comptant l'accueil, l'entretien médical et une pause après le don, la visite complète tourne autour de 45 minutes.",
+            "Le temps sur place dépend surtout de l'affluence du centre au moment de votre venue. Le prélèvement en lui-même reste la partie la plus courte de la visite — l'essentiel du temps est consacré à l'accueil et à l'entretien médical, dans votre intérêt.",
     },
     {
         id: "regles",
         claim: "On ne peut pas donner pendant ses règles.",
         reality:
             "Les règles ne sont pas un critère d'exclusion. Seuls l'âge, le poids et le délai depuis un don précédent sont vérifiés lors de l'entretien.",
+    },
+    {
+        id: "reserves-ok",
+        claim: "Il y a toujours assez de réserves, mon don n'est pas si urgent.",
+        reality:
+            "Au Bénin, la demande en sang dépasse structurellement l'offre disponible, et les pénuries reviennent par cycles malgré les efforts de collecte. Chaque don compte pour limiter ces creux, pas seulement en période de crise ponctuelle.",
     },
     {
         id: "gratuit",
@@ -71,10 +77,7 @@ export function FaqSection() {
     return (
         <section id="faq" className="bg-white py-20 sm:py-28">
             <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                <p className="mb-3 text-small font-medium uppercase tracking-wide text-primary-500">
-                    FAQ &amp; idées reçues
-                </p>
-                <h2 className="text-h2 max-w-2xl text-secondary">
+                <h2 className="mt-2 text-h2 max-w-2xl text-secondary">
                     Vos craintes, une par une
                 </h2>
                 <p className="mt-4 max-w-xl text-body-lg text-tertiary">
@@ -161,6 +164,6 @@ export function FaqSection() {
                     </a>
                 </div>
             </div>
-        </section >
+        </section>
     );
 }

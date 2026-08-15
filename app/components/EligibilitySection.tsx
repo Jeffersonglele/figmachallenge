@@ -129,9 +129,6 @@ export function EligibilitySection() {
         <section id="eligibilite" className="bg-neutral-50 py-20 sm:py-28">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl">
-                    <p className="text-small font-medium uppercase tracking-wide text-primary-600">
-                        Votre éligibilité
-                    </p>
                     <h2 className="mt-2 text-h2 text-secondary">Qui peut donner ?</h2>
                     <p className="mt-4 text-body-lg text-tertiary">
                         Un premier aperçu des critères généraux, puis un test rapide pour

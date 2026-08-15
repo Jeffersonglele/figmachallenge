@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Search, X, MapPin, Filter } from "lucide-react";
 
 type Department = { id: string; name: string; d: string; labelX: number; labelY: number };
 type City = { id: string; name: string; department: string; x: number; y: number };
@@ -12,9 +12,10 @@ type Center = {
     type: CenterType;
     cityId: string;
     address: string;
-    hours: string;
-    donationTypes: string[];
-    appointment: "libre" | "sur rendez-vous";
+    hours?: string;
+    donationTypes?: string[];
+    appointment?: "libre" | "sur rendez-vous";
+    contact: string;
 };
 
 const DEPARTMENTS: Department[] = [
@@ -29,35 +30,130 @@ const DEPARTMENTS: Department[] = [
     { id: "littoral", name: "Littoral", labelX: 155, labelY: 644, d: "M177.387,629.841L164.609,630.817L165.579,628.385L166.832,627.184L168.7,625.995L170.863,625.425L175.639,624.905L175.29,627.043L176.046,627.67L176.507,627.679L176.959,628.148L176.926,629.832L177.387,629.841Z" },
     { id: "oueme", name: "Ouémé", labelX: 175, labelY: 590, d: "M200.999,617.282L200.141,621.86L200.019,628.138L177.541,629.844L177.574,628.16L176.812,627.839L176.351,627.83L175.598,627.049L175.947,624.911L177.715,620.963L178.223,618.522L177.852,613.92L176.641,612.977L176.186,612.662L175.577,612.344L174.962,612.332L173.928,610.167L173.342,600.812L173.402,597.75L173.156,586.716L172.965,580.739L171.97,576.584L168.546,570.849L168.588,568.706L169.856,566.739L171.591,564.475L173.299,563.589L176.225,563.34L182.525,563.463L182.27,568.666L183.091,573.89L187.778,585.776L189.697,597.761L191.631,601.016L196.468,605.246L197.972,606.96L201.836,613.775L201.508,614.841L201.159,616.978L200.999,617.282Z" },
     { id: "collines", name: "Collines", labelX: 120, labelY: 460, d: "M199.689,471.586L199.68,472.046L200.578,473.289L201.597,476.219L204.002,479.023L204.894,480.572L205.171,482.109L203.981,495.872L182.928,495.461L181.545,495.434L179.925,499.692L179.561,502.595L180.279,505.213L179.95,506.279L178.405,506.708L177.317,507.3L174.001,511.83L172.726,514.103L172.986,516.559L173.704,519.177L155.581,510.399L148.404,507.961L142.42,507.385L137.041,507.28L132.29,506.575L128.499,503.897L124.723,500.453L119.235,498.049L114.643,497.04L94.028,497.864L92.03,497.825L92.069,495.834L92.466,475.469L92.783,459.239L93.409,442.861L93.639,431.071L92.891,422.173L92.448,421.245L91.833,421.233L91.537,420.614L92.046,418.173L92.097,415.57L95.739,410.127L96.082,408.296L95.642,407.215L93.095,403.795L92.658,402.562L92.682,401.337L92.588,398.271L94.432,398.307L99.958,398.721L101.956,398.76L102.573,398.619L103.649,398.64L112.61,396.364L114.306,396.091L115.535,396.115L116.15,396.127L117.217,396.607L118.127,397.237L118.883,397.865L121.592,400.828L122.502,401.458L123.117,401.47L123.726,401.789L124.34,401.801L127.414,401.861L128.028,401.873L128.938,402.503L129.24,402.815L130.738,404.836L131.491,405.616L132.401,406.247L133.314,406.724L136.216,407.7L136.671,408.015L137.882,408.958L138.343,408.967L138.952,409.285L141.411,409.333L142.637,409.51L145.382,410.636L145.997,410.648L146.609,410.813L149.067,410.861L150.77,410.281L152.011,409.693L152.945,409.098L154.349,408.053L155.141,406.843L154.538,406.219L153.818,403.754L155.374,394.9L153.863,385.68L153.121,384.287L152.223,383.044L153.054,379.844L206.979,381.508L208.487,406.658L208.735,409.726L207.898,413.233L207.106,414.443L205.063,416.701L204.425,417.914L204.407,418.833L204.678,420.676L204.66,421.595L203.808,425.867L203.77,427.858L204.029,430.313L204.753,432.625L206.667,436.951L207.393,439.11L207.349,441.407L206.391,443.226L205.282,444.89L204.481,446.559L204.138,448.39L204.019,454.515L202.353,461.069L201.767,467.491L201.442,468.404L200.327,470.373L200.005,471.133L199.996,471.592L199.689,471.586Z" },
+    { id: "plateau", name: "Plateau", labelX: 190, labelY: 530, d: "M203.981,495.872L203.608,499.234L204.145,503.227L206.068,507.094L209.07,510.829L211.3,514.702L210.909,518.983L210.584,519.896L210.572,520.508L210.108,520.653L207.966,520.151L206.89,520.13L206.113,520.575L205.785,521.641L207.443,546.947L207.416,548.325L206.938,549.235L206.148,550.292L205.188,552.264L204.715,552.868L204.7,553.633L204.98,555.017L205.881,556.107L208.452,558.302L209.049,559.232L208.567,560.295L207.479,560.887L206.087,561.319L204.846,561.907L202.162,565.531L202.397,569.212L203.703,573.22L204.08,577.517L202.921,581.783L202.572,583.92L202.994,585.92L203.741,587.007L204.652,587.637L205.721,587.964L206.951,587.988L207.553,588.613L207.532,589.685L208.055,594.443L207.416,595.656L206.172,596.398L204.295,598.046L203.024,600.166L202.982,602.31L203.667,606.612L203.625,608.755L201.366,614.226L197.502,607.411L195.998,605.696L191.161,601.466L189.226,598.212L187.308,586.227L182.621,574.341L181.8,569.117L181.902,563.911L184.053,563.953L184.821,563.968L185.436,563.98L185.897,563.989L186.213,563.535L186.216,563.382L185.845,558.78L183.764,547.251L183.797,545.567L183.808,544.954L183.206,544.33L178.508,540.868L177.037,537.47L175.619,531.315L175.336,530.084L175.366,528.553L174.923,527.625L174.323,526.848L174.034,525.923L174.123,521.33L173.547,519.327L172.83,516.709L172.57,514.253L173.844,511.98L177.161,507.45L178.249,506.858L179.794,506.429L180.122,505.363L179.405,502.745L179.769,499.842L181.389,495.585L182.772,495.612L203.825,496.022L203.981,495.872Z" },
 ];
 
-// Villes — coordonnées approximatives dérivées de la carte, positions à affiner visuellement
 const CITIES: City[] = [
+    { id: "karimama", name: "Karimama", department: "alibori", x: 190, y: 25 },
+    { id: "malanville", name: "Malanville", department: "alibori", x: 255, y: 45 },
+    { id: "kandi", name: "Kandi", department: "alibori", x: 230, y: 110 },
+    { id: "banikoara", name: "Banikoara", department: "alibori", x: 170, y: 160 },
     { id: "natitingou", name: "Natitingou", department: "atacora", x: 65, y: 205 },
+    { id: "kouande", name: "Kouandé", department: "atacora", x: 110, y: 230 },
+    { id: "djougou", name: "Djougou", department: "donga", x: 100, y: 290 },
     { id: "parakou", name: "Parakou", department: "borgou", x: 188, y: 268 },
-    { id: "bohicon", name: "Bohicon", department: "zou", x: 128, y: 535 },
-    { id: "lokossa", name: "Lokossa", department: "mono", x: 75, y: 615 },
-    { id: "abomey-calavi", name: "Abomey-Calavi", department: "atlantique", x: 150, y: 600 },
+    { id: "bante", name: "Bantè", department: "collines", x: 110, y: 460 },
+    { id: "dassa-zoume", name: "Dassa-Zoumè", department: "collines", x: 150, y: 430 },
+    { id: "djidja", name: "Djidja", department: "zou", x: 105, y: 515 },
+    { id: "lokossa", name: "Lokossa", department: "mono", x: 100, y: 600 },
+    { id: "come", name: "Comè", department: "mono", x: 115, y: 635 },
     { id: "porto-novo", name: "Porto-Novo", department: "oueme", x: 178, y: 598 },
-    { id: "cotonou", name: "Cotonou", department: "littoral", x: 158, y: 634 },
+    { id: "cotonou", name: "Cotonou", department: "littoral", x: 171, y: 628 },
 ];
 
-// ⚠️ Données d'exemple — à remplacer par les vraies structures ANTS (STS/PTS) une fois disponibles.
 const CENTERS: Center[] = [
-    { id: "c1", name: "ANTS — Siège / STS Cotonou", type: "sts", cityId: "cotonou", address: "Saint-Michel, en face de l'école St Augustin", hours: "Lun–Ven, 8h–17h30", donationTypes: ["Sang total", "Plasma", "Plaquettes"], appointment: "libre" },
-    { id: "c2", name: "PTS CNHU-HKM", type: "pts", cityId: "cotonou", address: "Campus CNHU, Cotonou", hours: "Lun–Sam, 8h–16h", donationTypes: ["Sang total"], appointment: "libre" },
-    { id: "c3", name: "PTS Centre de santé Calavi", type: "pts", cityId: "abomey-calavi", address: "Centre de santé communal, Abomey-Calavi", hours: "Lun–Ven, 8h–15h", donationTypes: ["Sang total"], appointment: "sur rendez-vous" },
-    { id: "c4", name: "PTS CHD Ouémé-Plateau", type: "pts", cityId: "porto-novo", address: "Centre Hospitalier Départemental, Porto-Novo", hours: "Lun–Ven, 8h–16h", donationTypes: ["Sang total", "Plasma"], appointment: "libre" },
-    { id: "c5", name: "PTS CHD Zou-Collines", type: "pts", cityId: "bohicon", address: "Centre Hospitalier Départemental, Bohicon", hours: "Lun–Ven, 8h–15h30", donationTypes: ["Sang total"], appointment: "sur rendez-vous" },
-    { id: "c6", name: "STS Parakou", type: "sts", cityId: "parakou", address: "Centre Hospitalier Départemental, Parakou", hours: "Lun–Sam, 8h–17h", donationTypes: ["Sang total", "Plasma", "Plaquettes"], appointment: "libre" },
-    { id: "c7", name: "PTS CHD Atacora-Donga", type: "pts", cityId: "natitingou", address: "Centre Hospitalier Départemental, Natitingou", hours: "Lun–Ven, 8h–15h", donationTypes: ["Sang total"], appointment: "sur rendez-vous" },
-    { id: "c8", name: "PTS CHD Mono-Couffo", type: "pts", cityId: "lokossa", address: "Centre Hospitalier Départemental, Lokossa", hours: "Lun–Ven, 8h–15h", donationTypes: ["Sang total"], appointment: "sur rendez-vous" },
+    { id: "c1", name: "Agence Nationale pour la Transfusion Sanguine (siège)", type: "sts", cityId: "cotonou", address: "Saint-Michel, en face de l'école St Augustin", contact: "" },
+    { id: "c2", name: "STS Littoral", type: "sts", cityId: "cotonou", address: "Dans l'enceinte du CNHU-HKM", contact: "" },
+    { id: "c3", name: "STS Ouémé", type: "sts", cityId: "porto-novo", address: "À côté de la maison des jeunes de Djègan Kpèvi", contact: "" },
+    { id: "c4", name: "STS Mono", type: "sts", cityId: "lokossa", address: "Derrière l'hôpital de zone de Lokossa", contact: "" },
+    { id: "c5", name: "PTS Comè", type: "pts", cityId: "come", address: "Dans l'enceinte de l'hôpital de zone de Comè", contact: "" },
+    { id: "c6", name: "PTS Djidja", type: "pts", cityId: "djidja", address: "Dans l'enceinte de l'hôpital de zone de Djidja (Mougnon)", contact: "" },
+    { id: "c7", name: "STS Collines", type: "sts", cityId: "dassa-zoume", address: "Dans l'enceinte de l'hôpital de zone de Dassa-Zoumè", contact: "" },
+    { id: "c8", name: "BS Bantè", type: "pts", cityId: "bante", address: "Au centre de santé de Bantè", contact: "" },
+    { id: "c9", name: "STS Borgou", type: "sts", cityId: "parakou", address: "À Parakou, en face de l'ORTB Parakou", contact: "" },
+    { id: "c10", name: "STS Donga", type: "sts", cityId: "djougou", address: "Dans l'enceinte de l'hôpital Ordre de Malte", contact: "" },
+    { id: "c11", name: "PTS Kouandé", type: "pts", cityId: "kouande", address: "Dans l'enceinte de l'hôpital de zone de Kouandé", contact: "" },
+    { id: "c12", name: "STS Atacora", type: "sts", cityId: "natitingou", address: "Dans l'enceinte de la DDS Atacora", contact: "" },
+    { id: "c13", name: "STS Kandi", type: "sts", cityId: "kandi", address: "Dans l'enceinte de l'hôpital de zone de Kandi", contact: "" },
+    { id: "c14", name: "PTS Banikoara", type: "pts", cityId: "banikoara", address: "Dans l'enceinte de l'hôpital de zone de Banikoara", contact: "" },
+    { id: "c15", name: "PTS Malanville", type: "pts", cityId: "malanville", address: "Dans l'enceinte de l'hôpital de zone de Malanville", contact: "" },
+    { id: "c16", name: "PTS Karimama", type: "pts", cityId: "karimama", address: "Au Centre de Santé de Karimama", contact: "" },
 ];
+
+/* ─────────────────────────── helpers ─────────────────────────── */
+
+function getCityForCenter(center: Center) {
+    return CITIES.find((c) => c.id === center.cityId);
+}
+
+function getDeptForCity(city: City | undefined) {
+    return city ? DEPARTMENTS.find((d) => d.id === city.department) : undefined;
+}
+
+/* ─────────────────────────── component ─────────────────────────── */
 
 export function MapSection() {
     const [selectedDept, setSelectedDept] = useState<string | null>(null);
     const [hoveredDept, setHoveredDept] = useState<string | null>(null);
 
+    // ── filtres ──
+    const [searchQuery, setSearchQuery] = useState("");
+    const [typeFilter, setTypeFilter] = useState<"all" | "sts" | "pts">("all");
+    const [deptFilter, setDeptFilter] = useState<string>("all");
+
+    const hasActiveFilters =
+        searchQuery.trim() !== "" || typeFilter !== "all" || deptFilter !== "all";
+
+    // ── centres filtrés (les 3 params combinés) ──
+    const filteredCenters = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+
+        return CENTERS.filter((center) => {
+            const city = getCityForCenter(center);
+            const dept = getDeptForCity(city);
+
+            // 1. recherche texte
+            const matchesQuery =
+                q === "" ||
+                center.name.toLowerCase().includes(q) ||
+                center.address.toLowerCase().includes(q) ||
+                (city?.name.toLowerCase().includes(q) ?? false) ||
+                (dept?.name.toLowerCase().includes(q) ?? false);
+
+            // 2. type de structure
+            const matchesType = typeFilter === "all" || center.type === typeFilter;
+
+            // 3. département
+            const matchesDept = deptFilter === "all" || city?.department === deptFilter;
+
+            return matchesQuery && matchesType && matchesDept;
+        });
+    }, [searchQuery, typeFilter, deptFilter]);
+
+    // départements concernés par les résultats filtrés → highlight sur la carte
+    const highlightedDepts = useMemo(() => {
+        const set = new Set<string>();
+        for (const center of filteredCenters) {
+            const city = getCityForCenter(center);
+            if (city) set.add(city.department);
+        }
+        return set;
+    }, [filteredCenters]);
+
+    // villes concernées par les résultats filtrés → pins sur la carte
+    const highlightedCities = useMemo(() => {
+        const set = new Set<string>();
+        for (const center of filteredCenters) {
+            set.add(center.cityId);
+        }
+        return set;
+    }, [filteredCenters]);
+
+    // auto-select du département quand les filtres ne touchent qu'un seul
+    useEffect(() => {
+        if (hasActiveFilters && highlightedDepts.size === 1) {
+            setSelectedDept(Array.from(highlightedDepts)[0]);
+        }
+    }, [hasActiveFilters, highlightedDepts]);
+
+    // synchroniser le filtre département ↔ sélection carte
+    useEffect(() => {
+        if (deptFilter !== "all") {
+            setSelectedDept(deptFilter);
+        }
+    }, [deptFilter]);
+
+    // ── centres pour le département sélectionné (sans filtres) ──
     const citiesInDept = useMemo(
         () => CITIES.filter((c) => c.department === selectedDept),
         [selectedDept]
@@ -71,8 +167,24 @@ export function MapSection() {
         return map;
     }, [citiesInDept]);
 
+    // ── compteurs par département (tenant compte des filtres actifs) ──
+    const countByDept = useMemo(() => {
+        const map = new Map<string, number>();
+        for (const center of filteredCenters) {
+            const city = getCityForCenter(center);
+            if (city) {
+                map.set(city.department, (map.get(city.department) ?? 0) + 1);
+            }
+        }
+        return map;
+    }, [filteredCenters]);
+
+    // ── actions ──
     function selectDept(id: string) {
-        setSelectedDept((current) => (current === id ? null : id));
+        const next = selectedDept === id ? null : id;
+        setSelectedDept(next);
+        // synchroniser le select du filtre
+        setDeptFilter(next ?? "all");
     }
 
     function handleKeyDown(e: React.KeyboardEvent, id: string) {
@@ -82,92 +194,305 @@ export function MapSection() {
         }
     }
 
-    // Recherche & filtres — exigés par le brief en complément de la navigation par carte
-    const [searchQuery, setSearchQuery] = useState("");
-    const [typeFilter, setTypeFilter] = useState<"all" | "Sang total" | "Plasma" | "Plaquettes">("all");
-    const [availabilityFilter, setAvailabilityFilter] = useState<"all" | "libre" | "sur rendez-vous">("all");
-
-    const hasActiveFilters =
-        searchQuery.trim() !== "" || typeFilter !== "all" || availabilityFilter !== "all";
-
-    const filteredCenters = useMemo(() => {
-        const q = searchQuery.trim().toLowerCase();
-        return CENTERS.filter((center) => {
-            const city = CITIES.find((c) => c.id === center.cityId);
-            const matchesQuery =
-                q === "" ||
-                center.name.toLowerCase().includes(q) ||
-                (city?.name.toLowerCase().includes(q) ?? false);
-            const matchesType = typeFilter === "all" || center.donationTypes.includes(typeFilter);
-            const matchesAvailability =
-                availabilityFilter === "all" || center.appointment === availabilityFilter;
-            return matchesQuery && matchesType && matchesAvailability;
-        });
-    }, [searchQuery, typeFilter, availabilityFilter]);
-
     function resetFilters() {
         setSearchQuery("");
         setTypeFilter("all");
-        setAvailabilityFilter("all");
+        setDeptFilter("all");
+        setSelectedDept(null);
     }
 
     const selectedDeptName = DEPARTMENTS.find((d) => d.id === selectedDept)?.name;
 
+    // ── résultats groupés par département puis ville ──
+    const groupedResults = useMemo(() => {
+        const groups: {
+            dept: Department;
+            cities: { city: City; centers: Center[] }[];
+        }[] = [];
+
+        const deptIds = Array.from(highlightedDepts);
+
+        for (const deptId of deptIds) {
+            const dept = DEPARTMENTS.find((d) => d.id === deptId);
+            if (!dept) continue;
+
+            const deptCities = CITIES.filter((c) => c.department === deptId);
+            const cityGroups: { city: City; centers: Center[] }[] = [];
+
+            for (const city of deptCities) {
+                const centers = filteredCenters.filter((c) => c.cityId === city.id);
+                if (centers.length > 0) {
+                    cityGroups.push({ city, centers });
+                }
+            }
+
+            if (cityGroups.length > 0) {
+                groups.push({ dept, cities: cityGroups });
+            }
+        }
+
+        return groups;
+    }, [filteredCenters, highlightedDepts]);
+
+    /* ─────────────────── carte : couleurs ─────────────────── */
+
+    function getDeptFill(deptId: string) {
+        const isSelected = deptId === selectedDept;
+        const isHovered = deptId === hoveredDept;
+        const isHighlighted = hasActiveFilters && highlightedDepts.has(deptId);
+        const isDimmed = hasActiveFilters && !isHighlighted;
+
+        if (isSelected) return "var(--color-primary-100)";
+        if (isHighlighted && isHovered) return "var(--color-primary-50)";
+        if (isHighlighted) return "var(--color-primary-50)";
+        if (isDimmed) return "var(--color-neutral-100)";
+        if (isHovered) return "var(--color-neutral-100)";
+        return "var(--color-neutral-50)";
+    }
+
+    function getDeptStroke(deptId: string) {
+        const isSelected = deptId === selectedDept;
+        const isHighlighted = hasActiveFilters && highlightedDepts.has(deptId);
+
+        if (isSelected) return "var(--color-primary-500)";
+        if (isHighlighted) return "var(--color-primary-300)";
+        return "var(--color-neutral-300)";
+    }
+
+    function getDeptStrokeWidth(deptId: string) {
+        return deptId === selectedDept ? 1.5 : 1;
+    }
+
+    function getDeptLabelColor(deptId: string) {
+        const isSelected = deptId === selectedDept;
+        const isDimmed = hasActiveFilters && !highlightedDepts.has(deptId);
+
+        if (isSelected) return "var(--color-primary-600)";
+        if (isDimmed) return "var(--color-neutral-300)";
+        return "var(--color-neutral-500)";
+    }
+
+    function getDeptLabelWeight(deptId: string) {
+        return deptId === selectedDept ? 600 : 400;
+    }
+
+    function getDeptOpacity(deptId: string) {
+        const isDimmed = hasActiveFilters && !highlightedDepts.has(deptId);
+        return isDimmed ? 0.5 : 1;
+    }
+
+    /* ─────────────────── carte : pins ─────────────────── */
+
+    function isCityVisible(city: City) {
+        if (hasActiveFilters) return highlightedCities.has(city.id);
+        return city.department === selectedDept;
+    }
+
+    /* ─────────────────── render center card ─────────────────── */
+
+    function renderCenterCard(center: Center, showCity = false) {
+        const city = getCityForCenter(center);
+        return (
+            <li
+                key={center.id}
+                className="rounded-lg border border-neutral-200 bg-white p-4 transition-shadow hover:shadow-sm"
+            >
+                <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                        <p className="font-heading text-body font-semibold text-secondary">
+                            {center.name}
+                        </p>
+                        {showCity && city && (
+                            <p className="mt-0.5 flex items-center gap-1 text-small text-neutral-500">
+                                <MapPin className="h-3 w-3 shrink-0" aria-hidden="true" />
+                                {city.name}
+                            </p>
+                        )}
+                    </div>
+                    <span
+                        className={[
+                            "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
+                            center.type === "sts"
+                                ? "bg-primary-50 text-primary-600"
+                                : "bg-neutral-100 text-neutral-600",
+                        ].join(" ")}
+                    >
+                        {center.type.toUpperCase()}
+                    </span>
+                </div>
+                <p className="mt-1 text-small text-tertiary">{center.address}</p>
+                <dl className="mt-3 grid grid-cols-2 gap-y-1 text-small text-tertiary">
+                    <dt className="text-neutral-500">Horaires</dt>
+                    <dd>{center.hours ?? "Lundi au Vendredi : 08h – 17h30"}</dd>
+                    <dt className="text-neutral-500">Accueil</dt>
+                    <dd className="capitalize">{center.appointment ?? "libre"}</dd>
+                    <dt className="text-neutral-500">Dons acceptés</dt>
+                    <dd>{center.donationTypes?.join(", ") ?? "Sang Total"}</dd>
+                    <dt className="text-neutral-500">Contacts</dt>
+                    <dd>{center.contact || "+229 21 32 04 35"}</dd>
+                </dl>
+            </li>
+        );
+    }
+
+    /* ─────────────────── render ─────────────────── */
+
     return (
         <section id="centres" className="bg-white py-20 sm:py-28">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                {/* En-tête */}
                 <div className="max-w-2xl">
-                    <p className="text-small font-medium uppercase tracking-wide text-primary-600">
-                        Où donner
-                    </p>
-                    <h2 className="mt-2 text-h2 text-secondary">Trouvez un centre près de chez vous</h2>
+                    <h2 className="mt-2 text-h2 text-secondary">
+                        Trouvez un centre près de chez vous
+                    </h2>
                     <p className="mt-4 text-body-lg text-tertiary">
-                        Cherchez par ville ou par nom, filtrez par type de don ou disponibilité — ou
-                        explorez directement la carte.
+                        Cherchez par ville ou par nom, filtrez par type de structure ou par
+                        département — ou explorez directement la carte.
                     </p>
                 </div>
 
-                <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+                {/* ── Barre de filtres ── */}
+                <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-end">
+                    {/* Recherche texte */}
                     <div className="relative flex-1">
+                        <label htmlFor="center-search" className="sr-only">
+                            Rechercher une ville ou un centre
+                        </label>
                         <Search
                             className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
                             aria-hidden="true"
                         />
                         <input
+                            id="center-search"
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Rechercher une ville ou un centre…"
-                            aria-label="Rechercher une ville ou un centre"
-                            className="w-full rounded-lg border border-neutral-300 py-2.5 pl-10 pr-4 text-body text-secondary focus-visible:border-primary-500"
+                            placeholder="Rechercher une ville, un centre…"
+                            className="w-full rounded-lg border border-neutral-300 py-2.5 pl-10 pr-10 text-body text-secondary placeholder:text-neutral-400 focus-visible:border-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20"
                         />
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={() => setSearchQuery("")}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 text-neutral-400 hover:text-neutral-600"
+                                aria-label="Effacer la recherche"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        )}
                     </div>
-                    <select
-                        value={typeFilter}
-                        onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
-                        aria-label="Filtrer par type de don"
-                        className="rounded-lg border border-neutral-300 px-3 py-2.5 text-body text-secondary focus-visible:border-primary-500"
-                    >
-                        <option value="all">Tous les types de don</option>
-                        <option value="Sang total">Sang total</option>
-                        <option value="Plasma">Plasma</option>
-                        <option value="Plaquettes">Plaquettes</option>
-                    </select>
-                    <select
-                        value={availabilityFilter}
-                        onChange={(e) => setAvailabilityFilter(e.target.value as typeof availabilityFilter)}
-                        aria-label="Filtrer par disponibilité"
-                        className="rounded-lg border border-neutral-300 px-3 py-2.5 text-body text-secondary focus-visible:border-primary-500"
-                    >
-                        <option value="all">Toute disponibilité</option>
-                        <option value="libre">Accès libre</option>
-                        <option value="sur rendez-vous">Sur rendez-vous</option>
-                    </select>
+
+                    {/* Type de structure */}
+                    <div>
+                        <label htmlFor="filter-type" className="mb-1 block text-small font-medium text-neutral-500">
+                            Type
+                        </label>
+                        <select
+                            id="filter-type"
+                            value={typeFilter}
+                            onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
+                            className="rounded-lg border border-neutral-300 px-3 py-2.5 text-body text-secondary focus-visible:border-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20"
+                        >
+                            <option value="all">Tous les types</option>
+                            <option value="sts">STS — Service</option>
+                            <option value="pts">PTS — Poste</option>
+                        </select>
+                    </div>
+
+                    {/* Département */}
+                    <div>
+                        <label htmlFor="filter-dept" className="mb-1 block text-small font-medium text-neutral-500">
+                            Département
+                        </label>
+                        <select
+                            id="filter-dept"
+                            value={deptFilter}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                setDeptFilter(val);
+                                setSelectedDept(val === "all" ? null : val);
+                            }}
+                            className="rounded-lg border border-neutral-300 px-3 py-2.5 text-body text-secondary focus-visible:border-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/20"
+                        >
+                            <option value="all">Tous les départements</option>
+                            {DEPARTMENTS.map((d) => (
+                                <option key={d.id} value={d.id}>
+                                    {d.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Reset */}
+                    {hasActiveFilters && (
+                        <button
+                            type="button"
+                            onClick={resetFilters}
+                            className="inline-flex items-center gap-1.5 self-end rounded-lg border border-neutral-300 px-3 py-2.5 text-small font-medium text-neutral-600 transition-colors hover:bg-neutral-50"
+                        >
+                            <X className="h-3.5 w-3.5" />
+                            Réinitialiser
+                        </button>
+                    )}
                 </div>
 
+                {/* Filtres actifs — pills */}
+                {hasActiveFilters && (
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                        <Filter className="h-4 w-4 text-neutral-400" aria-hidden="true" />
+                        {searchQuery.trim() !== "" && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-700">
+                                « {searchQuery.trim()} »
+                                <button
+                                    type="button"
+                                    onClick={() => setSearchQuery("")}
+                                    aria-label={`Retirer le filtre "${searchQuery.trim()}"`}
+                                    className="ml-0.5 rounded-full p-0.5 hover:bg-primary-100"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </span>
+                        )}
+                        {typeFilter !== "all" && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-700">
+                                {typeFilter === "sts" ? "STS" : "PTS"}
+                                <button
+                                    type="button"
+                                    onClick={() => setTypeFilter("all")}
+                                    aria-label="Retirer le filtre type"
+                                    className="ml-0.5 rounded-full p-0.5 hover:bg-primary-100"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </span>
+                        )}
+                        {deptFilter !== "all" && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-700">
+                                {DEPARTMENTS.find((d) => d.id === deptFilter)?.name}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setDeptFilter("all");
+                                        setSelectedDept(null);
+                                    }}
+                                    aria-label="Retirer le filtre département"
+                                    className="ml-0.5 rounded-full p-0.5 hover:bg-primary-100"
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
+                            </span>
+                        )}
+                        <span className="text-xs text-neutral-500">
+                            — {filteredCenters.length} centre{filteredCenters.length > 1 ? "s" : ""}
+                        </span>
+                    </div>
+                )}
+
+                {/* ── Grille carte + résultats ── */}
                 <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start">
-                    {/* Panneau d'info */}
+                    {/* Panneau résultats */}
                     <div>
+                        {/* Légende */}
                         <p className="mb-1 text-small font-medium text-neutral-500">
                             <span className="mr-3 inline-flex items-center gap-1">
                                 <span className="h-2 w-2 rounded-full bg-primary-500" /> STS — Service de Transfusion
@@ -177,76 +502,59 @@ export function MapSection() {
                             </span>
                         </p>
 
+                        {/* ── Mode filtres actifs ── */}
                         {hasActiveFilters ? (
                             <div className="mt-4">
-                                <div className="mb-4 flex items-center justify-between">
-                                    <h3 className="font-heading text-h4 text-secondary">
-                                        Résultats{filteredCenters.length > 0 ? ` (${filteredCenters.length})` : ""}
-                                    </h3>
-                                    <button
-                                        type="button"
-                                        onClick={resetFilters}
-                                        className="text-small font-medium text-primary-600 hover:text-primary-700"
-                                    >
-                                        Réinitialiser
-                                    </button>
-                                </div>
-
                                 {filteredCenters.length === 0 ? (
                                     <div className="rounded-lg border border-dashed border-neutral-300 p-6 text-center">
                                         <p className="text-body text-tertiary">
-                                            Aucun centre ne correspond à votre recherche.
+                                            Aucun centre ne correspond à vos critères.
                                         </p>
+                                        <button
+                                            type="button"
+                                            onClick={resetFilters}
+                                            className="mt-3 text-small font-medium text-primary-600 hover:text-primary-700"
+                                        >
+                                            Réinitialiser les filtres
+                                        </button>
                                     </div>
                                 ) : (
-                                    <ul className="space-y-3">
-                                        {filteredCenters.map((center) => {
-                                            const city = CITIES.find((c) => c.id === center.cityId);
-                                            return (
-                                                <li
-                                                    key={center.id}
-                                                    className="rounded-lg border border-neutral-200 p-4"
-                                                >
-                                                    <div className="flex items-start justify-between gap-3">
-                                                        <div>
-                                                            <p className="font-heading text-body font-semibold text-secondary">
-                                                                {center.name}
-                                                            </p>
-                                                            <p className="text-small text-neutral-500">{city?.name}</p>
-                                                        </div>
-                                                        <span
-                                                            className={[
-                                                                "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
-                                                                center.type === "sts"
-                                                                    ? "bg-primary-50 text-primary-600"
-                                                                    : "bg-neutral-100 text-neutral-600",
-                                                            ].join(" ")}
-                                                        >
-                                                            {center.type.toUpperCase()}
-                                                        </span>
+                                    <div className="space-y-6">
+                                        {groupedResults.map(({ dept, cities }) => (
+                                            <div key={dept.id}>
+                                                <h3 className="mb-3 font-heading text-h4 text-secondary">
+                                                    {dept.name}
+                                                    <span className="ml-2 text-small font-normal text-neutral-400">
+                                                        {countByDept.get(dept.id) ?? 0} centre
+                                                        {(countByDept.get(dept.id) ?? 0) > 1 ? "s" : ""}
+                                                    </span>
+                                                </h3>
+                                                {cities.map(({ city, centers }) => (
+                                                    <div key={city.id} className="mb-4">
+                                                        <p className="mb-2 flex items-center gap-1.5 text-small font-semibold uppercase tracking-wide text-neutral-500">
+                                                            <MapPin className="h-3 w-3" aria-hidden="true" />
+                                                            {city.name}
+                                                        </p>
+                                                        <ul className="space-y-3">
+                                                            {centers.map((c) => renderCenterCard(c))}
+                                                        </ul>
                                                     </div>
-                                                    <p className="mt-1 text-small text-tertiary">{center.address}</p>
-                                                    <dl className="mt-3 grid grid-cols-2 gap-y-1 text-small text-tertiary">
-                                                        <dt className="text-neutral-500">Horaires</dt>
-                                                        <dd>{center.hours}</dd>
-                                                        <dt className="text-neutral-500">Accueil</dt>
-                                                        <dd className="capitalize">{center.appointment}</dd>
-                                                        <dt className="text-neutral-500">Dons acceptés</dt>
-                                                        <dd>{center.donationTypes.join(", ")}</dd>
-                                                    </dl>
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
+                                                ))}
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
                         ) : !selectedDept ? (
+                            /* ── Aucun département sélectionné ── */
                             <div className="mt-6 rounded-lg border border-dashed border-neutral-300 p-6 text-center">
                                 <p className="text-body text-tertiary">
-                                    Sélectionnez un département sur la carte pour voir les villes et centres disponibles.
+                                    Sélectionnez un département sur la carte ou utilisez les filtres
+                                    pour voir les centres disponibles.
                                 </p>
                             </div>
                         ) : (
+                            /* ── Département sélectionné (sans filtres) ── */
                             <div className="mt-4">
                                 <h3 className="mb-4 font-heading text-h4 text-secondary">
                                     Centres — {selectedDeptName}
@@ -262,115 +570,105 @@ export function MapSection() {
                                             const centers = centersByCity.get(city.id) ?? [];
                                             if (centers.length === 0) return null;
                                             return (
-                                                <div key={city.id} id={`city-${city.id}`}>
-                                                    <p className="mb-2 text-small font-semibold uppercase tracking-wide text-neutral-500">
+                                                <div key={city.id}>
+                                                    <p className="mb-2 flex items-center gap-1.5 text-small font-semibold uppercase tracking-wide text-neutral-500">
+                                                        <MapPin className="h-3 w-3" aria-hidden="true" />
                                                         {city.name}
                                                     </p>
                                                     <ul className="space-y-3">
-                                                        {centers.map((center) => (
-                                                            <li
-                                                                key={center.id}
-                                                                className="rounded-lg border border-neutral-200 p-4"
-                                                            >
-                                                                <div className="flex items-start justify-between gap-3">
-                                                                    <p className="font-heading text-body font-semibold text-secondary">
-                                                                        {center.name}
-                                                                    </p>
-                                                                    <span
-                                                                        className={[
-                                                                            "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
-                                                                            center.type === "sts"
-                                                                                ? "bg-primary-50 text-primary-600"
-                                                                                : "bg-neutral-100 text-neutral-600",
-                                                                        ].join(" ")}
-                                                                    >
-                                                                        {center.type.toUpperCase()}
-                                                                    </span>
-                                                                </div>
-                                                                <p className="mt-1 text-small text-tertiary">{center.address}</p>
-                                                                <dl className="mt-3 grid grid-cols-2 gap-y-1 text-small text-tertiary">
-                                                                    <dt className="text-neutral-500">Horaires</dt>
-                                                                    <dd>{center.hours}</dd>
-                                                                    <dt className="text-neutral-500">Accueil</dt>
-                                                                    <dd className="capitalize">{center.appointment}</dd>
-                                                                    <dt className="text-neutral-500">Dons acceptés</dt>
-                                                                    <dd>{center.donationTypes.join(", ")}</dd>
-                                                                </dl>
-                                                            </li>
-                                                        ))}
+                                                        {centers.map((c) => renderCenterCard(c))}
                                                     </ul>
                                                 </div>
                                             );
                                         })}
                                     </div>
                                 )}
-
-                                <p className="mt-4 text-xs text-neutral-400">
-                                    Données d&apos;exemple — à remplacer par les structures réelles.
-                                </p>
                             </div>
                         )}
                     </div>
 
-                    {/* Carte */}
-                    <div className="relative mx-auto w-full max-w-sm">
+                    {/* ── Carte ── */}
+                    <div className="relative mx-auto w-full max-w-sm lg:sticky lg:top-24">
                         <svg
                             viewBox="0 0 329 647"
                             className="h-auto w-full"
                             role="img"
                             aria-label="Carte des départements du Bénin. Sélectionner un département pour afficher ses centres de don de sang."
                         >
-                            {DEPARTMENTS.map((dept) => {
-                                const isSelected = dept.id === selectedDept;
-                                const isHovered = dept.id === hoveredDept;
-                                return (
-                                    <g key={dept.id}>
-                                        <path
-                                            d={dept.d}
-                                            tabIndex={0}
-                                            role="button"
-                                            aria-pressed={isSelected}
-                                            aria-label={`Département ${dept.name}${isSelected ? ", sélectionné" : ""}`}
-                                            onClick={() => selectDept(dept.id)}
-                                            onKeyDown={(e) => handleKeyDown(e, dept.id)}
-                                            onMouseEnter={() => setHoveredDept(dept.id)}
-                                            onMouseLeave={() => setHoveredDept(null)}
-                                            className="cursor-pointer transition-colors duration-200"
-                                            fill={
-                                                isSelected
-                                                    ? "var(--color-primary-100)"
-                                                    : isHovered
-                                                        ? "var(--color-neutral-100)"
-                                                        : "var(--color-neutral-50)"
-                                            }
-                                            stroke={isSelected ? "var(--color-primary-500)" : "var(--color-neutral-300)"}
-                                            strokeWidth={isSelected ? 1.5 : 1}
-                                        />
-                                        <text
-                                            x={dept.labelX}
-                                            y={dept.labelY}
-                                            textAnchor="middle"
-                                            className="pointer-events-none select-none font-body text-[9px]"
-                                            fill={isSelected ? "var(--color-primary-600)" : "var(--color-neutral-500)"}
-                                            fontWeight={isSelected ? 600 : 400}
-                                        >
-                                            {dept.name}
-                                        </text>
-                                    </g>
-                                );
-                            })}
+                            {DEPARTMENTS.map((dept) => (
+                                <g
+                                    key={dept.id}
+                                    style={{ opacity: getDeptOpacity(dept.id) }}
+                                    className="transition-opacity duration-300"
+                                >
+                                    <path
+                                        d={dept.d}
+                                        tabIndex={0}
+                                        role="button"
+                                        aria-pressed={dept.id === selectedDept}
+                                        aria-label={`Département ${dept.name}${dept.id === selectedDept ? ", sélectionné" : ""}${countByDept.has(dept.id) ? ` — ${countByDept.get(dept.id)} centre${(countByDept.get(dept.id) ?? 0) > 1 ? "s" : ""}` : ""}`}
+                                        onClick={() => selectDept(dept.id)}
+                                        onKeyDown={(e) => handleKeyDown(e, dept.id)}
+                                        onMouseEnter={() => setHoveredDept(dept.id)}
+                                        onMouseLeave={() => setHoveredDept(null)}
+                                        className="cursor-pointer transition-colors duration-200"
+                                        fill={getDeptFill(dept.id)}
+                                        stroke={getDeptStroke(dept.id)}
+                                        strokeWidth={getDeptStrokeWidth(dept.id)}
+                                    />
+                                    <text
+                                        x={dept.labelX}
+                                        y={dept.labelY}
+                                        textAnchor="middle"
+                                        className="pointer-events-none select-none font-body text-[9px]"
+                                        fill={getDeptLabelColor(dept.id)}
+                                        fontWeight={getDeptLabelWeight(dept.id)}
+                                    >
+                                        {dept.name}
+                                    </text>
+                                    {/* Compteur de centres sur la carte */}
+                                    {hasActiveFilters && (countByDept.get(dept.id) ?? 0) > 0 && (
+                                        <>
+                                            <circle
+                                                cx={dept.labelX}
+                                                cy={dept.labelY + 14}
+                                                r="8"
+                                                fill="var(--color-primary-500)"
+                                                className="pointer-events-none"
+                                            />
+                                            <text
+                                                x={dept.labelX}
+                                                y={dept.labelY + 17.5}
+                                                textAnchor="middle"
+                                                className="pointer-events-none select-none font-heading text-[8px] font-bold"
+                                                fill="white"
+                                            >
+                                                {countByDept.get(dept.id)}
+                                            </text>
+                                        </>
+                                    )}
+                                </g>
+                            ))}
 
-                            {/* Pins — masqués tant que le département n'est pas sélectionné */}
+                            {/* Pins villes */}
                             {CITIES.map((city) => {
-                                const visible = city.department === selectedDept;
+                                const visible = isCityVisible(city);
                                 return (
                                     <g
                                         key={city.id}
                                         transform={`translate(${city.x}, ${city.y})`}
                                         className="transition-opacity duration-300"
-                                        style={{ opacity: visible ? 1 : 0, pointerEvents: visible ? "auto" : "none" }}
+                                        style={{
+                                            opacity: visible ? 1 : 0,
+                                            pointerEvents: visible ? "auto" : "none",
+                                        }}
                                     >
-                                        <circle r="5" fill="var(--color-primary-500)" stroke="white" strokeWidth="1.5" />
+                                        <circle
+                                            r="5"
+                                            fill="var(--color-primary-500)"
+                                            stroke="white"
+                                            strokeWidth="1.5"
+                                        />
                                         <text
                                             y="-10"
                                             textAnchor="middle"

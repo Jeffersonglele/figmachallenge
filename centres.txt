@@ -1,0 +1,59 @@
+ PTS Karimama (PTS)
+Description: Poste de Transfusion Sanguine
+Localisation: Situé au Centre de Santé de Karimama 
+
+ PTS Malanville (PTS)
+Description: Poste de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de l'hôpital de zone de Malanville 
+
+ PTS Banikoara (PTS)
+Description: Poste de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de l'hôpital de zone de Banikoara 
+
+ STS Kandi (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de l'hôpital de zone de Kandi 
+
+ STS Atacora (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de la DDS Atacora 
+
+ PTS Kouandé (PTS)
+Description: Poste de Transfusion Sanguine
+Localisation: Situé dans l'enceinte l'hôpital de zone de Kouandé 
+
+ STS Donga (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de l'hôpital Ordre de Malte 
+
+ STS Borgou (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé à Parakou en face de l’ORTB Parakou 
+
+ BS Bantè (PTS)
+Description: Poste de Transfusion Sanguine
+Localisation: Situé au centre de Santé de Bantè 
+
+ STS Collines (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de l'hôpital de zone de Dassa-Zoumè 
+
+ STS Littoral (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé dans l'enceinte du CNHU-HKM 
+
+ STS Ouémé (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé à porto-Novo à côté de la maison des jeunes de Djègan Kpèvi, Porto-Novo 
+
+ STS Mono (STS)
+Description: Service de Transfusion Sanguine
+Localisation: Situé derrière l'hôpital de zone de Lokossa 
+
+ PTS Comè (PTS)
+Description: Poste de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de l'hôpital de zone de Comè 
+
+ PTS Djidja (PTS)
+Description: Poste de Transfusion Sanguine
+Localisation: Situé dans l'enceinte de l'hôpital de zone de Djidja (Mougnon) 
