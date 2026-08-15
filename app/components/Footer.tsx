@@ -109,12 +109,6 @@ export function Footer() {
                             © {year} NAHUN. Les informations de ce site sont données à titre indicatif ; seul un
                             entretien médical professionnel peut confirmer l&apos;aptitude au don.
                         </p>
-
-                        <a href="#top"
-                            className="text-xs font-medium text-white/50 transition-colors hover:text-white"
-                        >
-                            Retour en haut ↑
-                        </a >
                     </div >
                 </div>
             </div>

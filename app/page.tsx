@@ -5,6 +5,8 @@ import { DeroulementSection } from "@/components/DeroulementSection";
 import { MapSection } from "./components/MapSection";
 import { FaqSection } from "./components/FaqSection";
 import { Footer } from "./components/Footer";
+import { BackToTop } from "./components/BackToTop";
+import { ReservesSection } from "./components/ReservesSection";
 
 export default function Home() {
   return (
@@ -15,9 +17,11 @@ export default function Home() {
         <EligibilitySection />
         <DeroulementSection />
         <MapSection />
+        <ReservesSection />
         <FaqSection />
       </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 }
