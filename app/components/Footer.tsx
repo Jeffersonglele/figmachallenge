@@ -27,8 +27,8 @@ export function Footer() {
                     {/* Marque */}
                     <div>
                         <div className="flex items-center gap-2">
-                            <span className="relative flex h-7 w-7 items-center justify-center">
-                                <Image src="/logo/logo2_nahun.png" alt="Logo" width={50} height={50} />
+                            <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-primary-500">
+                                <Image src="/logo/logo2_nahun.png" alt="Logo" width={22} height={22} className="object-contain" />
                             </span>
                             <span className="font-heading text-lg font-semibold">
                                 NA<span className="text-primary-500">HUN</span>

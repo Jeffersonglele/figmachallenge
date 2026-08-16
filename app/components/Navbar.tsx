@@ -78,7 +78,7 @@ export function Navbar() {
                         <Link
                             href="/"
                             aria-label="NAHUN"
-                            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors flex-shrink-0"
+                            className="flex h-9 w-9 items-center justify-center rounded-full bg-white hover:bg-neutral-100 transition-colors flex-shrink-0"
                         >
                             <Image
                                 src="/logo/logo_nahun.png"

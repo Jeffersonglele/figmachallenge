@@ -4,6 +4,8 @@ Ce document retrace la méthodologie de conception assistée par IA du projet **
 
 Conformément au brief, ce fichier privilégie l'honnêteté intellectuelle à l'exhaustivité technique : il documente ce qui a été demandé, ce qui a été ajusté manuellement, et les limites concrètement rencontrées — y compris les cas où l'IA a refusé ou corrigé une demande.
 
+**Note sur la paternité du design** : l'ensemble des choix de direction artistique et d'architecture de contenu de ce projet (identité NA HUN, palette, structure des sections, angle éditorial) est de mon fait ; l'IA est intervenue en exécution et en relecture. Une seule exception assumée : le mécanisme d'interaction de la Navbar au scroll (section 1 et section 11 ci-dessous) est directement adapté d'une référence externe trouvée en ligne, pas d'une idée originale de ma part.
+
 ---
 
 ## Outil d'IA sollicité
@@ -69,6 +71,8 @@ Itération suivante : fourniture d'une référence visuelle externe (site type "
 
 Le mega-menu "Centres" a été construit non comme décoration mais pour répondre à l'exigence brief C6 (8+ centres, filtrage par ville).
 
+*Voir aussi section 11 : troisième itération de ce composant, avec attribution explicite d'une source copiée.*
+
 ### 2. Hero — premier jet (C1 — Pourquoi donner)
 Sur la base d'une seconde référence visuelle (toujours au style sombre), consigne explicite de ne pas reproduire l'esthétique mais de garder une structure de nav flottante adaptée à un hero clair.
 
@@ -85,6 +89,8 @@ Itération finale : demande explicite d'un comportement à trois temps —
 3. panneau d'info à gauche listant villes + centres du département sélectionné,
 
 avec référence à la page officielle de l'ANTS (`ants.bj/lieu_sang`) et sa nomenclature STS (Service de Transfusion) / PTS (Poste de Transfusion).
+
+**Correction ultérieure** : le même fichier de référence a permis d'identifier un département manquant (le Plateau) dans le tracé initialement transcrit — le contour réel a été récupéré depuis ce même fichier source et réintégré. Les positions des villes ont par ailleurs été validées géométriquement (test point-dans-polygone) après un signalement visuel de pins mal placés, révélant que 5 des 15 villes tombaient hors du contour de leur département.
 
 ### 4. FAQ — premier jet (C8)
 Structure proposée par l'IA : séparation entre "idées reçues" (format mythe → réalité) et "questions pratiques" (Q&A classique), pour répondre à l'exigence brief de "déconstruire les idées reçues" plutôt que d'empiler des questions génériques.
@@ -118,6 +124,15 @@ Demande d'amélioration de la section FAQ après les changements apportés aux s
 - ajout de l'étiquette "eyebrow" manquante en tête de section, absente alors que toutes les autres sections de la page en comportent une (incohérence de gabarit repérée par l'IA) ;
 - ajout d'un nouveau mythe ("il y a toujours assez de réserves") s'appuyant sur les faits découverts lors de la reconstruction de la section Réserves (pénuries cycliques, demande structurellement supérieure à l'offre), créant un lien thématique entre les deux sections plutôt que de les laisser isolées.
 
+### 11. Navbar — refonte du comportement au scroll, source directement copiée
+Contrairement aux itérations précédentes (sections 1, 2, 3, 6) où seul le **mécanisme** d'une référence était repris tout en écartant son esthétique, cette itération part d'une consigne différente : reproduire fidèlement le comportement d'un menu trouvé en ligne (panneau plein écran coulissant depuis la droite, gros intitulés, item dépliable avec tags secondaires), avec la précision explicite de l'utilisateur que ce design n'est pas une idée originale mais un choix directement copié.
+
+Comportement implémenté :
+- en haut de page (non scrollé) : navigation inline complète, identique à l'existant (section 1) ;
+- au scroll : disparition de la navigation inline et du CTA, ne subsistent que le logo et un bouton menu ;
+- au clic sur ce bouton : ouverture du panneau plein écran (mobile) / demi-écran ancré à droite (desktop), avec item "Centres" dépliable révélant les villes en tags — adaptation du bloc "Services" de la référence à notre propre mega-menu existant plutôt qu'un ajout arbitraire.
+
+Palette et typographie de la référence (noir/blanc/gris, `Clash Grotesk`) non reprises, remplacées par les tokens NAHUN (`primary`/`secondary`, Poppins/Inter), conformément au principe déjà appliqué en sections 1 et 6. Ajouts d'accessibilité non présents dans la référence : fermeture au clic extérieur et à `Échap`, focus renvoyé sur le bouton de fermeture à l'ouverture, `role="dialog"` + `aria-modal`.
 
 ---
 
@@ -128,16 +143,17 @@ Demande d'amélioration de la section FAQ après les changements apportés aux s
 | Esthétique du Hero et de la Navbar | Rejet du fond sombre des références visuelles fournies (site "Explore/Destinations", puis capture du bouton retour en haut) | Incohérence avec le ton rassurant exigé par le brief pour un public novice anxieux (le brief disqualifie explicitement une page "froide") |
 | Granularité de la carte des centres | Département (référence source) → ville | Le brief exige un filtrage par ville, pas par grande zone administrative |
 | Contenu des régions/villes touristiques | Non repris tel quel dans les fichiers de référence fournis | Contenu éditorial et photographique protégé, appartenant au site source (voir Limites) |
-| Données des centres (STS/PTS) | Remplacées par des données d'exemple explicitement marquées comme telles | Impossibilité de récupérer les vraies données ANTS (voir Limites) |
+| Données des centres (STS/PTS) | Remplacées par les structures réelles listées sur `ants.bj/lieu_sang` (relevé manuel) ; horaires, types de don et modalité de rendez-vous restent à confirmer | Les données mock initiales ont été remplacées dès que la liste réelle a pu être collectée manuellement (voir Limites pour la partie encore incomplète) |
 | Durées affichées (Déroulement + FAQ) | Suppression des minutages fixes par étape, remplacés par une formulation qualitative | Demande explicite de l'utilisateur ; l'imprécision d'un chronométrage fixe risquait de créer de fausses attentes |
 | Contenu Hero | Ajout de statistiques réelles (ANTS) et de l'ancrage culturel du nom NAHUN (étymologie fongbé) | Contenu jugé insuffisamment développé par l'utilisateur en première version |
 | Contenu Réserves | Ajout d'un paragraphe de contexte structurel sourcé (ANTS/OMS) et de compatibilités par groupe sanguin | Section jugée froide et peu informative par l'utilisateur en première version |
+| Comportement Navbar au scroll | Remplacement de la barre inline persistante par un menu plein écran déclenché par un bouton unique | Design directement copié d'une référence externe à la demande explicite de l'utilisateur (voir section 11) |
 
 ---
 
 ## Limites rencontrées avec l'outil
 
-1. **Impossibilité de récupérer les données réelles de l'ANTS (centres).** La page `ants.bj/lieu_sang` charge la liste des structures STS/PTS de manière dynamique (JavaScript), après le chargement initial de la page. L'outil de récupération web utilisé par l'IA ne peut lire que le HTML statique initial, sans exécuter de JavaScript — la liste réelle des centres, leurs adresses et horaires n'a donc pas pu être extraite automatiquement. Ce point a été anticipé et accepté : les données de centres du projet sont explicitement des exemples ("mock"), à remplacer par les vraies informations dans une itération ultérieure.
+1. **Récupération partielle des données réelles de l'ANTS (centres).** La page `ants.bj/lieu_sang` charge la liste des structures STS/PTS de manière dynamique (JavaScript) ; l'outil de récupération web utilisé par l'IA ne peut lire que le HTML statique initial, sans exécuter de JavaScript. La liste des 15 structures (noms, localisation) a donc été collectée manuellement par l'utilisateur puis transmise à l'IA pour intégration — les horaires, types de don acceptés et modalités de rendez-vous, non disponibles sur la page source dans l'état actuel de la collecte, restent marqués "à confirmer" plutôt que d'être inventés.
 
 2. **Absence de donnée publique en temps réel (réserves par groupe sanguin).** Contrairement aux centres, ce n'est pas une limite technique de l'outil mais une limite de la donnée elle-même : après recherche, aucune source publique ne publie l'état des stocks de sang par groupe sanguin au Bénin (donnée opérationnelle interne à l'ANTS). Les pourcentages affichés en section Réserves restent donc des exemples ; en revanche, le contexte narratif autour (pénuries structurelles, répartition par bénéficiaires) s'appuie sur des sources réelles et vérifiées.
 
