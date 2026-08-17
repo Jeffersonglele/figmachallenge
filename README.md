@@ -73,8 +73,8 @@ Le nom **NA HUN** est en fongbé, la langue la plus parlée au sud du Bénin. Le
 ### Choix du logo
 Le logo a été conçu entièrement avec Canva par moi-même. Il ressort un coeur dans laquelle est disposé une petite goutte de sang. Cette disposition donne un autre effet visuel au design qui tend à montrer deux petites gouttes de sang qui s'enlacent.
 
-![Logo Nahun](logo/logo_nahun.png)
-![Logo Nahun](logo/logo2_nahun.png)
+![Logo Nahun](public/logo/logo_nahun.png)
+![Logo Nahun](public/logo/logo2_nahun.png)
 
 ### Ton éditorial
 Les textes évitent le ton médical froid et les formulations sensationnalistes. L'approche : expliquer avec précision, sans dramatiser ni minimiser. Les durées et chiffres non confirmés par l'ANTS ne sont pas inventés — ils sont signalés comme illustratifs ou omis.
